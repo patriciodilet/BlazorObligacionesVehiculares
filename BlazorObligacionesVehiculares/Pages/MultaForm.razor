@@ -1,0 +1,65 @@
+﻿@page "/multaform"
+@page "/multaform/{Id:int}"
+
+@using Data
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h3>CervezaForm</h3>
+
+<EditForm Model="@oMulta">
+    <div class="container-fluid">
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">IdVehiculo</label>
+            <div class="col-sm-9">
+                <InputNumber class="form-control" @bind-Value="@oMulta.IdVehiculo"></InputNumber>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Valor Multa</label>
+            <div class="col-sm-9">
+                <InputNumber class="form-control" @bind-Value="@oMulta.ValorMulta"></InputNumber>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="Save">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    Multa oMulta = new Multa();
+    Respuesta<object> oRespuesta = new Respuesta<object>();
+    Respuesta<Multa> oRespuestaMulta = new Respuesta<Multa>();
+    public string Url = "api/Multa";
+
+    private async Task Save()
+    {
+        if (Id != 0)
+        {
+            var response = await Http.PutAsJsonAsync<Multa>(Url, oMulta);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        else
+        {
+            var response = await Http.PostAsJsonAsync<Multa>(Url, oMulta);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        NavigationManager.NavigateTo("/multas");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            oRespuestaMulta = await Http.GetFromJsonAsync<Respuesta<Multa>>(Url + "/" + Id);
+            oMulta = oRespuestaMulta.Data;
+        }
+    }
+
+}

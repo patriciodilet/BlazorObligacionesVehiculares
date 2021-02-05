@@ -1,0 +1,47 @@
+﻿@page "/multas"
+
+@using System.Net.Http
+@using System.Net.Http.Json
+@using BlazorObligacionesVehiculares.Data
+@inject HttpClient Http
+
+<h3>Multas</h3>
+
+
+<div class="row">
+    <div class="col-12 text-right">
+        <a href="multaform">Nuevo</a>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>ValorMulta</th>
+        <th>IdVehiculo</th>
+        <th></th>
+    </tr>
+    @if (oRespuesta != null && oRespuesta.Data != null)
+    {
+        @foreach (var oElement in oRespuesta.Data)
+        {
+            <tr>
+                <td>@oElement.Id</td>
+                <td>@oElement.ValorMulta</td>
+                <td>@oElement.IdVehiculo</td>
+                <td>
+                    <a href="/multaform/@oElement.Id">Editar</a>
+                    <a href="/eliminarmulta/@oElement.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    }
+</table>
+
+@code {
+    public string Url = "/api/Multa/";
+    public Data.Respuesta<List<Multa>> oRespuesta = new Data.Respuesta<List<Multa>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<Multa>>>(Url);
+}

@@ -1,0 +1,46 @@
+﻿@page "/modelos"
+
+@using System.Net.Http
+@using System.Net.Http.Json
+@using BlazorObligacionesVehiculares.Data
+
+@inject HttpClient Http
+
+
+<h3>Modelos</h3>
+
+<div class="row">
+    <div class="col-12 text-right">
+        <a href="modeloform">Nuevo</a>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Modelo</th>
+        <th></th>
+    </tr>
+    @if (oRespuesta != null && oRespuesta.Data != null)
+    {
+        @foreach (var oElement in oRespuesta.Data)
+        {
+            <tr>
+                <td>@oElement.Id</td>
+                <td>@oElement.Modelo1</td>
+                <td>
+                    <a href="/modeloform/@oElement.Id">Editar</a>
+                    <a href="/eliminarmodelo/@oElement.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    }
+</table>
+
+@code {
+    public string Url = "/api/Modelo/";
+    public Data.Respuesta<List<Modelo>> oRespuesta = new Data.Respuesta<List<Modelo>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<Modelo>>>(Url);
+}

@@ -1,0 +1,71 @@
+﻿@page "/pagoform"
+@page "/pagoform/{Id:int}"
+
+@using Data
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+<h3>PagoForm</h3>
+
+<EditForm Model="@oPago">
+    <div class="container-fluid">
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">IdMulta</label>
+            <div class="col-sm-9">
+                <InputNumber class="form-control" @bind-Value="@oPago.IdMulta"></InputNumber>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">IdVehiculo</label>
+            <div class="col-sm-9">
+                <InputNumber class="form-control" @bind-Value="@oPago.IdVehiculo"></InputNumber>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">ValorPago</label>
+            <div class="col-sm-9">
+                <InputNumber class="form-control" @bind-Value="@oPago.ValorPago"></InputNumber>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="Save">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    Pago oPago = new Pago();
+    Respuesta<object> oRespuesta = new Respuesta<object>();
+    Respuesta<Pago> oRespuestaPago = new Respuesta<Pago>();
+    public string Url = "api/Pago";
+
+    private async Task Save()
+    {
+        if (Id != 0)
+        {
+            var response = await Http.PutAsJsonAsync<Pago>(Url, oPago);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        else
+        {
+            var response = await Http.PostAsJsonAsync<Pago>(Url, oPago);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        NavigationManager.NavigateTo("/pagos");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            oRespuestaPago = await Http.GetFromJsonAsync<Respuesta<Pago>>(Url + "/" + Id);
+            oPago = oRespuestaPago.Data;
+        }
+    }
+
+}

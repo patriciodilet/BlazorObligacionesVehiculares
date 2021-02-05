@@ -1,0 +1,47 @@
+﻿@page "/vehiculos"
+
+@using System.Net.Http
+@using System.Net.Http.Json
+@using BlazorObligacionesVehiculares.Data
+@inject HttpClient Http
+
+<h3>Vehiculos</h3>
+
+<div class="row">
+    <div class="col-12 text-right">
+        <a href="vehiculoform">Nuevo</a>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Patente</th>
+        <th>IdModelo</th>
+        <th></th>
+    </tr>
+    @if (oRespuesta != null && oRespuesta.Data != null)
+    {
+        @foreach (var oElement in oRespuesta.Data)
+        {
+            <tr>
+                <td>@oElement.Id</td>
+                <td>@oElement.Patente</td>
+                <td>@oElement.IdModelo</td>
+                <td>
+                    <a href="/vehiculoform/@oElement.Id">Editar</a>
+                    <a href="/eliminarvehiculo/@oElement.Id">Eliminar</a>
+                </td>
+            </tr>
+        }
+    }
+</table>
+
+@code {
+    public string Url = "/api/Vehiculo/";
+    public Data.Respuesta<List<Vehiculo>> oRespuesta = new Data.Respuesta<List<Vehiculo>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<Vehiculo>>>(Url);
+}
+

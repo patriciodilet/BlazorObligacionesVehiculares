@@ -1,0 +1,66 @@
+﻿@page "/permisocirculacionform"
+@page "/permisocirculacionform/{Id:int}"
+
+@using Data
+@using System.Net.Http
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<h3>Permiso Circulacion Form</h3>
+
+<EditForm Model="@oPermisoCirculacion">
+    <div class="container-fluid">
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Modelo</label>
+            <div class="col-sm-9">
+                <InputText class="form-control"></InputText>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <label class="col-sm-3">Valor Modelo</label>
+            <div class="col-sm-9">
+                <InputText class="form-control"></InputText>
+            </div>
+        </div>
+        <div class="form-group row mb-1">
+            <div class="col-sm-12">
+                <button class="btn btn-primary" @onclick="Save">Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    PermisoCirculacion oPermisoCirculacion = new PermisoCirculacion();
+    Respuesta<object> oRespuesta = new Respuesta<object>();
+    Respuesta<PermisoCirculacion> oRespuestaPermisoCirculacion = new Respuesta<PermisoCirculacion>();
+    public string Url = "api/PermisoCirculacion";
+
+    private async Task Save()
+    {
+        if (Id != 0)
+        {
+            var response = await Http.PutAsJsonAsync<PermisoCirculacion>(Url, oPermisoCirculacion);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        else
+        {
+            var response = await Http.PostAsJsonAsync<PermisoCirculacion>(Url, oPermisoCirculacion);
+            oRespuesta = response.Content.ReadFromJsonAsync<Respuesta<object>>().Result;
+        }
+        NavigationManager.NavigateTo("/permisocirculacion");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            oRespuestaPermisoCirculacion = await Http.GetFromJsonAsync<Respuesta<PermisoCirculacion>>(Url + "/" + Id);
+            oPermisoCirculacion = oRespuestaPermisoCirculacion.Data;
+        }
+    }
+
+}

@@ -1,0 +1,45 @@
+﻿@page "/permisocirculacion"
+
+@using System.Net.Http
+@using System.Net.Http.Json
+@using BlazorObligacionesVehiculares.Data
+@inject HttpClient Http
+
+<h3>Permiso Circulacion</h3>
+
+<div class="row">
+    <div class="col-12 text-right">
+        <a href="permisocirculacionform">Nuevo</a>
+    </div>
+</div>
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>IdModelo</th>
+        <th>Valor Permiso</th>
+        <th></th>
+    </tr>
+    @if (oRespuesta != null && oRespuesta.Data != null)
+    {
+        @foreach (var oElement in oRespuesta.Data)
+        {
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    <a href="/permisocirculacionform/">Editar</a>
+                    <a href="/eliminarpermisocirculacion/">Eliminar</a>
+                </td>
+            </tr>
+        }
+    }
+</table>
+*
+@code {
+    public string Url = "/api/PermisoCirculacion/";
+    public Data.Respuesta<List<PermisoCirculacion>> oRespuesta = new Data.Respuesta<List<PermisoCirculacion>>();
+
+    protected override async Task OnInitializedAsync() =>
+        oRespuesta = await Http.GetFromJsonAsync<Respuesta<List<PermisoCirculacion>>>(Url);
+}
